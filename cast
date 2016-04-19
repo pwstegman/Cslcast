@@ -1,0 +1,42 @@
+#!/bin/bash
+
+ACTION=$1
+
+if [[ "$ACTION" == "--server" || "$ACTION" == "-s" ]]; then
+
+	#Run as server
+	echo "Run as server"
+
+elif [[ "$ACTION" == "--help" || "$ACTION" == "-h" ]]; then
+
+	#Display help
+	echo "CSLCast 0.1"
+	echo -e "Run the command $0 to cast your screen\n"
+	echo -e "Usage: $0 [OPTION]\n\n\t--server\trun as server"
+
+else
+
+	#Run as client (cast to server)
+	
+	SERVER="pi2-testing"
+	if [ -n "$ACTION" ]; then
+		SERVER="$ACTION"
+	fi
+	echo "Connecting to $SERVER..."
+
+	ping -c 1 ${SERVER}.tjhsst.edu > /dev/null 2> /dev/null
+	if [ $? -ne 0 ]; then
+		echo "$SERVER is offline"
+		exit
+	fi
+
+	(hostname > /dev/tcp/$SERVER/12345) > /dev/null 2> /dev/null
+	if [ $? -eq 0 ]; then
+		echo "Press ctrl+c to exit"
+		x11vnc -display $DISPLAY -rfbauth ~2016pstegman/tools/cslcast/passwd -viewonly -q -bg > /dev/null 2> /dev/null
+	else
+		sleep 0.5
+		echo "Error casting to projector"
+	fi
+
+fi
