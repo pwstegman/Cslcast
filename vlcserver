@@ -1,0 +1,1 @@
+cvlc screen:// --screen-fps=10 --sout '#transcode{vcodec=h264,acodec=none,fps=10}:rtp{dst=239.192.1.23,port=5004,mux=ts,ttl=1}' --sout-keep

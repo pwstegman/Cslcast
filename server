@@ -1,0 +1,23 @@
+#!/bin/bash
+
+PASSWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/passwd" #grabs passwd file from same directory as this script
+PORT="12345"
+
+if [ ! -e "$PASSWD" ]; then
+        echo "Unable to read password file $PASSWD"
+        exit
+fi
+
+echo "Server listening on port $PORT"
+
+while true
+do
+	HOST=$(nc -l -p $PORT)
+	echo "Connecting to $HOST"
+	if [ -n "$HOST" ]; then
+		sleep 2
+		echo "$(date) - $HOST" >> castServer.log
+		vncviewer $HOST -passwd passwd -encodings raw -fullscreen
+	fi
+done 
+
