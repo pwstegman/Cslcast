@@ -1,0 +1,38 @@
+#!/bin/bash
+
+HOSTS=( "$@" )
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+if [ "$1" == "--help" ] || [ "$1" == "-help" ] || [ "$1" == "-h" ]; then
+	echo -e "Usage: cast [host1] [host2] [host3] ... [hostn]\nCasts to each host in the list. If no host is specified, it defaults to the projector in room 200C.
+
+To display a cast on this screen, run the command cast --server or cast -s"
+	exit
+fi
+
+if [ "$1" == "--server" ] || [ "$1" == "-server" ] || [ "$1" == "-s" ] || [ "$1" == "--receive" ]; then
+	echo -e "Waiting for someone to cast to this screen...\nOn the computer you want to cast, run the command: cast $(hostname)"
+	$DIR/server
+	exit
+fi
+
+HOSTS[0]="${HOSTS[0]:-pi2-testing}" #if no server specified, default to pi2-testing
+PASSWD="$DIR/../pass/passwd" #grabs passwd file from same directory as this script
+
+if [ ! -e "$PASSWD" ]; then
+	echo "Unable to read password file $PASSWD"
+	exit
+fi
+
+for SERVER in "${HOSTS[@]}"; do
+	(ping -c 1 ${SERVER} > /dev/null 2> /dev/null && echo "Casting to $SERVER") || echo "$SERVER is offline"
+done
+
+for SERVER in "${HOSTS[@]}"; do
+	(hostname > /dev/tcp/$SERVER/12345) > /dev/null 2> /dev/null
+done
+
+echo "Press ctrl+c to exit"
+x11vnc -display $DISPLAY -rfbauth "$PASSWD" -viewonly -ncache 16 -q -bg > /dev/null 2> /dev/null
+

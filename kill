@@ -1,3 +1,0 @@
-#!/bin/bash
-#This script is not needed now that ctrl+c is used to kill cast.sh
-x11vnc -R stop
