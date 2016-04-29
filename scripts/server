@@ -17,7 +17,7 @@ do
 	if [ -n "$HOST" ]; then
 		sleep 2
 		echo "$(date) - $HOST" >> castServer.log
-		vncviewer $HOST -passwd passwd -encodings raw -fullscreen
+		vncviewer $HOST -passwd $PASSWD -encodings raw -fullscreen
 	fi
 done 
 

@@ -1,14 +1,22 @@
 #!/bin/bash
 
-HOSTS=( "$@" )
-
+PARAMS=( "$@" )
+HostsIndex=0
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 if [ "$1" == "--help" ] || [ "$1" == "-help" ] || [ "$1" == "-h" ]; then
-	echo -e "Usage: cast [host1] [host2] [host3] ... [hostn]\nCasts to each host in the list. If no host is specified, it defaults to the projector in room 200C.
+	echo -e "Usage: cast [options] [host1] [host2] ... [hostn]\nCasts to each host in the list. If no host is specified, it defaults to the projector in room 200C.
 
-To display a cast on this screen, run the command cast --server or cast -s"
+--lowres\tToo much lag? Use this option to lower the screen resolution to speed up casting
+--server\tTo display a cast on this screen"
 	exit
+fi
+
+if [ "$1" == "--lowres" ]; then
+	xrandr -s 1024x768
+	((HostsIndex++))
+else
+	xrandr -s 1440x900
 fi
 
 if [ "$1" == "--server" ] || [ "$1" == "-server" ] || [ "$1" == "-s" ] || [ "$1" == "--receive" ]; then
@@ -17,7 +25,7 @@ if [ "$1" == "--server" ] || [ "$1" == "-server" ] || [ "$1" == "-s" ] || [ "$1"
 	exit
 fi
 
-HOSTS[0]="${HOSTS[0]:-pi2-testing}" #if no server specified, default to pi2-testing
+PARAMS[$HostsIndex]="${PARAMS[$HostsIndex]:-pi2-testing}" #if no server specified, default to pi2-testing
 PASSWD="$DIR/../pass/passwd" #grabs passwd file from same directory as this script
 
 if [ ! -e "$PASSWD" ]; then
@@ -25,14 +33,15 @@ if [ ! -e "$PASSWD" ]; then
 	exit
 fi
 
-for SERVER in "${HOSTS[@]}"; do
-	(ping -c 1 ${SERVER} > /dev/null 2> /dev/null && echo "Casting to $SERVER") || echo "$SERVER is offline"
+for SERVER in "${PARAMS[@]:$HostsIndex}"; do
+	(ping -c 1 ${SERVER} > /dev/null 2> /dev/null && echo "Casting to $SERVER from $(hostname)") || echo "$SERVER is offline"
 done
 
-for SERVER in "${HOSTS[@]}"; do
+for SERVER in "${PARAMS[@]:$HostsIndex}"; do
 	(hostname > /dev/tcp/$SERVER/12345) > /dev/null 2> /dev/null
 done
-
+echo "Want better framerates? Use cast --lowres [host] to speed up casting"
 echo "Press ctrl+c to exit"
-x11vnc -display $DISPLAY -rfbauth "$PASSWD" -viewonly -ncache 16 -q -bg > /dev/null 2> /dev/null
-
+#x11vnc -display $DISPLAY -rfbauth "$PASSWD" -viewonly -ncache 16 -q -bg > /dev/null 2> /dev/null
+x11vnc -display $DISPLAY -rfbauth "$PASSWD" -viewonly -q -bg > /dev/null 2> /dev/null
+xrandr -s 1920x1200
