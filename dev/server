@@ -1,5 +1,4 @@
 #!/bin/bash
-#Author: Pierce Stegman
 
 PASSWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../pass/passwd" #grabs passwd file from same directory as this script
 PORT="12345"

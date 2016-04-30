@@ -1,0 +1,5 @@
+Usage: cast [options] [host1] [host2] ... [hostn]
+Casts to each host in the list. If no host is specified, it defaults to the projector in room 200C.
+
+-r [width]x[height]	Too much lag? Use this option to lower the screen resolution while casting
+-s					To display a cast on this screen

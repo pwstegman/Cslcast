@@ -1,10 +1,9 @@
 #!/bin/bash
-#Author: Pierce Stegman
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 showHelp () {
-	cat $DIR/help.txt
+	cat help.txt
 	exit
 }
 
