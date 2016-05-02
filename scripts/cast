@@ -27,8 +27,9 @@ shift $(($OPTIND - 1))
 
 if [ -z "$RES" ]; then RES="1440x900"; fi
 
+OLDRES=$(xrandr --current 2>/dev/null | grep "\*" | awk 'NR==1{print $1}')
 xrandr -s "$RES"
 
 $DIR/client ${@}
 
-xrandr -s 1920x1200 #Reset back to original resolution
+xrandr -s $OLDRES #Reset back to original resolution
